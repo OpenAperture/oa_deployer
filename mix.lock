@@ -1,0 +1,6 @@
+%{"hackney": {:hex, :hackney, "1.3.2"},
+  "httpoison": {:hex, :httpoison, "0.7.4"},
+  "idna": {:hex, :idna, "1.0.2"},
+  "openaperture_auth": {:git, "https://github.com/OpenAperture/auth.git", "dc7a0813b335d3013dff60d271ae1f51fc4b5049", [ref: "dc7a0813b335d3013dff60d271ae1f51fc4b5049"]},
+  "poison": {:hex, :poison, "1.3.1"},
+  "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"}}
