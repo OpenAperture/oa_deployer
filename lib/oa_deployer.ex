@@ -7,7 +7,7 @@ defmodule OaDeployer do
       _main(args)
     rescue
       e in RuntimeError ->
-        IO.puts "\n#{e}"
+        IO.puts "\n#{inspect e}"
         exit({:shutdown, 1})
     end
   end
