@@ -11,4 +11,4 @@ Deploys OpenAperture via CLI
     -a <action>     (build, deploy, or deploy_ecs)
     -s <server_url> OpenAperture manager server url
     -h <hash>       source commit hash
-    -b <branch>     _docker repo branch to use
+    -n <branch>     _docker repo branch to use
