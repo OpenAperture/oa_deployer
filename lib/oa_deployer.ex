@@ -28,7 +28,7 @@ defmodule OaDeployer do
       url -> url
     end
     auth_request_json = %{
-      grant_type: "client_credentials", 
+      grant_type: "client_credentials",
       client_id: Application.get_env(:oa_deployer, :oauth_user),
       client_secret: Application.get_env(:oa_deployer, :oauth_pass)
     }
@@ -41,7 +41,7 @@ defmodule OaDeployer do
     auth_token = case http.post(Application.get_env(:oa_deployer, :oauth_url), auth_request_json, headers, []) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}}      -> Poison.decode!("#{body}")["access_token"]
       {:ok, %HTTPoison.Response{status_code: s_code}}   -> Util.exit_with_error "Failed to retrieve OAuth header: Status code: #{s_code}"
-      {:error, %HTTPoison.Error{id: _, reason: reason}} -> Util.exit_with_error "Failed to retrieve OAuth header: #{reason}"
+      {:error, %HTTPoison.Error{id: _, reason: reason}} -> Util.exit_with_error "Failed to retrieve OAuth header: #{inspect reason}"
     end
 
     workflow_request = %{deployment_repo: List.first(project_repo_list),
@@ -52,7 +52,7 @@ defmodule OaDeployer do
       {:error, reason} -> Util.exit_with_error "Failed to encode payload: #{inspect reason}"
       {:ok, json} -> json
     end
-    
+
     headers = [{"Authorization", "Bearer access_token=#{auth_token}"}, {"Content-Type", "application/json"}]
     workflow_id = case http.post("#{oa_url}/workflows", workflow_json, headers, []) do
       {:ok, %HTTPoison.Response{status_code: 201, headers: headers}}      -> headers |> get_header("location") |> Util.after_last_forward_slash
@@ -107,7 +107,7 @@ defmodule OaDeployer do
             case timeout_cnt do
               x when x < 120 ->
                 :timer.sleep 10000
-                check_until_complete(oa_url, auth_token, workflow_id, 0, timeout_cnt+1, response["current_step"], http)            
+                check_until_complete(oa_url, auth_token, workflow_id, 0, timeout_cnt+1, response["current_step"], http)
               _ -> Util.exit_with_error "Failed - a timeout has occurred"
             end
         end
