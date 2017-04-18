@@ -16,7 +16,7 @@ defmodule OaDeployerTest do
       end
     end
 
-    def get(_url, headers) do
+    def get(_url, headers, _opts) do
       assert OaDeployer.get_header(headers, "Authorization") == "Bearer access_token=abc123"
       {:ok, %HTTPoison.Response{status_code: 200, body: "{\"workflow_completed\":true,\"workflow_error\":false}"}}
     end

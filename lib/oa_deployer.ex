@@ -38,7 +38,7 @@ defmodule OaDeployer do
       {:ok, json} -> json
     end
     headers = [{"Content-Type", "application/json"}]
-    auth_token = case http.post(Application.get_env(:oa_deployer, :oauth_url), auth_request_json, headers, []) do
+    auth_token = case http.post(Application.get_env(:oa_deployer, :oauth_url), auth_request_json, headers, [ssl: [{:versions, [:'tlsv1.2']}]]) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}}      -> Poison.decode!("#{body}")["access_token"]
       {:ok, %HTTPoison.Response{status_code: s_code}}   -> Util.exit_with_error "Failed to retrieve OAuth header: Status code: #{s_code}"
       {:error, %HTTPoison.Error{id: _, reason: reason}} -> Util.exit_with_error "Failed to retrieve OAuth header: #{inspect reason}"
@@ -54,7 +54,7 @@ defmodule OaDeployer do
     end
 
     headers = [{"Authorization", "Bearer access_token=#{auth_token}"}, {"Content-Type", "application/json"}]
-    workflow_id = case http.post("#{oa_url}/workflows", workflow_json, headers, []) do
+    workflow_id = case http.post("#{oa_url}/workflows", workflow_json, headers, [ssl: [{:versions, [:'tlsv1.2']}]]) do
       {:ok, %HTTPoison.Response{status_code: 201, headers: headers}}      -> headers |> get_header("location") |> Util.after_last_forward_slash
       {:ok, %HTTPoison.Response{status_code: 401}}      -> Util.exit_with_error "Authentication error (401) contacting server"
       {:ok, %HTTPoison.Response{status_code: s_code}}   -> Util.exit_with_error "Workflow Creation Request Failed - Status code: #{s_code}"
@@ -66,7 +66,7 @@ defmodule OaDeployer do
       {:ok, json} -> json
     end
 
-    case http.post("#{oa_url}/workflows/#{workflow_id}/execute", execute_json, headers, []) do
+    case http.post("#{oa_url}/workflows/#{workflow_id}/execute", execute_json, headers, [ssl: [{:versions, [:'tlsv1.2']}]]) do
       {:ok, %HTTPoison.Response{status_code: 202}}      -> nil
       {:ok, %HTTPoison.Response{status_code: 204}}      -> nil
       {:ok, %HTTPoison.Response{status_code: 401}}      -> Util.exit_with_error "Authentication error (401) contacting server"
@@ -80,7 +80,7 @@ defmodule OaDeployer do
   @spec check_until_complete(String.t, String.t, String.t, integer, integer, String.t :: nil, atom) :: String.t
   defp check_until_complete(oa_url, auth_token, workflow_id, error_count, timeout_cnt, current_step, http) do
     endpoint = "#{oa_url}/workflows/#{workflow_id}"
-    case http.get(endpoint, [{"Authorization", "Bearer access_token=#{auth_token}"}]) do
+    case http.get(endpoint, [{"Authorization", "Bearer access_token=#{auth_token}"}], [ssl: [{:versions, [:'tlsv1.2']}]]) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         response = Poison.decode!(body)
         case {response["workflow_completed"], response["workflow_error"]} do
