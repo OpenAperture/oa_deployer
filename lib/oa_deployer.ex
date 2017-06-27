@@ -91,7 +91,13 @@ defmodule OaDeployer do
           {true, true}  ->
             workflow_error_msg = case response["workflow_error"] do
               nil -> ""
-              _   -> response["event_log"] |> Poison.decode! |> Enum.reduce("", &"#{&2}\n#{&1}")
+              _   ->
+                case Poison.decode(response["event_log"]) do
+                  {:ok, data} ->  Enum.reduce(data, "", &"#{&2}\n#{&1}")
+                  {:error, info} ->
+                    IO.puts "Failed to decode event log: #{inspect info}"
+                    inspect info
+                end
             end
             Util.exit_with_error "Failed on milestone milestone #{response["current_step"]} in #{response["elapsed_workflow_time"]}:\n\nWorkflow Log\n-----\n#{workflow_error_msg}"
           _ ->
