@@ -3,4 +3,4 @@
 set -e
 
 mix deps.get
-escript.build
+mix escript.build
