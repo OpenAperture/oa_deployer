@@ -93,10 +93,13 @@ defmodule OaDeployer do
               nil -> ""
               _   ->
                 case Poison.decode(response["event_log"]) do
-                  {:ok, data} ->  Enum.reduce(data, "", &"#{&2}\n#{&1}")
+                  {:ok, data} ->
+                     Enum.reduce(data, "", &"#{&2}\n#{&1}")
+                  {:error, {:invalid, "O"}} ->
+                    response["event_log"]
                   {:error, info} ->
-                    IO.puts "Failed to decode event log: #{inspect info}"
-                    inspect info
+                    IO.puts "Unexpected info returned from decoding event log: #{inspect info}"
+                    response["event_log"]
                 end
             end
             Util.exit_with_error "Failed on milestone milestone #{response["current_step"]} in #{response["elapsed_workflow_time"]}:\n\nWorkflow Log\n-----\n#{workflow_error_msg}"
