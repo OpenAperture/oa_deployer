@@ -24,7 +24,7 @@ defmodule OaDeployer do
       action       -> Util.exit_with_error "Invalid action: #{action}"
     end
     oa_url = case Keyword.get(parsed_args, :server_url, nil) do
-      nil -> "https://openaperture-mgr.psft.co"
+      nil -> "https://openaperture-mgr.lxk.co"
       url -> url
     end
     auth_request_json = %{
